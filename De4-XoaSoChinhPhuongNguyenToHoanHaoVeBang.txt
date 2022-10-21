@@ -1,0 +1,162 @@
+#include<iostream>
+#include <math.h>
+using namespace std;
+
+struct DeTai
+{
+	string MaDeTai;
+	string TenDeTai;
+	string TacGia;
+	string BaoCao;
+	int ThuHang;
+};
+// dinh nghia node
+struct Node
+{
+	DeTai data;
+	Node *Next;	
+};
+typedef Node *Nodeptr;
+
+//ham tao node
+Nodeptr CreateNode(DeTai x)
+{
+	Nodeptr p;
+	p=new Node;
+	p->data=x;
+	p->Next=NULL;
+	return p;
+}
+void InsertLast(Nodeptr &Head,Nodeptr &Tail,Nodeptr p)
+{
+	if(Head==NULL)
+	{
+		Head=p;
+		Tail=p;
+	}
+	else
+	{
+		Tail->Next=p;
+		Tail=Tail->Next;//Theo y kien cua Phat
+	}
+}
+
+void DeleteFirst(Nodeptr &Head,Nodeptr &Tail){
+	Nodeptr p;
+	if(Head!=NULL){
+		p=Head; 
+		Head=p->Next;//Head=Head-Next;
+		if(Head==NULL)Tail=NULL;
+		delete p;
+	}
+}
+void DeleteAfter(Nodeptr q, Nodeptr &Tail){
+	Nodeptr p;
+	if(q!=NULL){
+		p=q->Next;
+		if(p!=NULL){
+			q->Next=p->Next;
+			if(q==Tail)Tail=q;
+			delete p;	
+		}
+	}
+}
+void DeleteNode(Nodeptr &Head, Nodeptr &Tail, int key){
+      Nodeptr p=Head;
+      if(p->data.ThuHang == key)DeleteFirst(Head,Tail);
+      else{
+          Nodeptr q  = p;
+          p=p->Next;
+          while(p!= NULL){
+              if(p->data.ThuHang == key){
+                  DeleteAfter(q,Tail);
+                  break;
+              }
+              q = p;
+              p=p->Next;
+
+          }
+      }
+}
+
+bool KiemtraSoHH(int x){
+	int sum=0;
+	for(int i=1;i<x;i++){
+		if(x%i==0){
+			sum=sum+i;
+		}
+	}
+	if(sum!=0&&sum==x){
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool KiemTraSoChinhPhuong(int x){
+    int sqr = sqrt(x);
+    if(sqr*sqr == x)return true;
+    else return false;
+}
+
+bool KiemTraSoNguyenTo(int soA){
+    if (soA < 2) return false;
+	else if (soA>2){
+		if (soA % 2 == 0)return false;
+		for (int i = 3; i < sqrt((float)soA); i += 2){
+			if (soA%i == 0)return false;
+		}
+	}
+	return true;
+}
+
+void xuat(DeTai x)
+{
+	cout<<x.MaDeTai<<"\t"<<x.TenDeTai<<"\t"<<x.TacGia<<"\t";
+	cout<<x.BaoCao<<"\t"<<x.ThuHang<<"\t"<<endl;
+}
+void Print(Nodeptr Head,Nodeptr Tail)
+{
+	Nodeptr p=Head;
+	while(p!=NULL)
+	{
+	    xuat(p->data);
+		p=p->Next;
+	}
+}
+
+void XoaSoHoanHao(Nodeptr &Head, Nodeptr &Tail){
+    int dem=0;
+    for(Nodeptr p=Head;p!=NULL;p=p->Next){
+        if(KiemTraSoNguyenTo(p->data.ThuHang))dem++;
+    }
+    
+    for(int i=0;i<dem;i++){
+        for(Nodeptr p=Head;p!=NULL;p=p->Next){
+            if(KiemTraSoNguyenTo(p->data.ThuHang))
+            DeleteNode(Head,Tail,p->data.ThuHang);
+        }
+    }
+}
+
+int main()
+{
+	Nodeptr p,Head,Tail;
+	Head=Tail=NULL;
+	DeTai x[3]=
+	{	{"BT01","Banh trang","BonBon","Khoa",2},
+		{"BT02","Com chay","Bon","Truong",4},
+		{"BT03","Banh trang","Ary","Khoa",3}
+	};
+	for(int i=0;i<3;i++)
+	{
+	p=CreateNode(x[i]);
+	InsertLast(Head,Tail,p);
+	};
+	cout<<"\n Xuat mat hang "<<endl;
+	Print(Head,Tail);
+	XoaSoHoanHao(Head,Tail);
+	cout<<"\n Mat hang sau khi xoa: "<<endl;
+	Print(Head,Tail);
+}
